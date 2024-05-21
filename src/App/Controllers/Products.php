@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Controllers;
 use App\Models\Product;
 use Framework\Viewer;
@@ -16,7 +15,9 @@ class Products
 
         $viewer = new Viewer;
 
-        $viewer->render("products_index.php", [
+        echo $viewer->render("shared/header.php");
+
+        echo $viewer->render("Products/index.php", [
             "products" => $products
         ]);
 
@@ -24,9 +25,15 @@ class Products
 
     public function show(string $id)
     {
-        var_dump($id);
 
-        require "./../views/products_show.php";
+        $viewer = new Viewer;
+
+        echo $viewer->render("shared/header.php");
+
+        echo $viewer->render("Products/show.php", [
+            "id" => $id
+        ]);
+
     }
     public function showPage(string $title, string $id, string $page)
     {
