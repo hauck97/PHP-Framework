@@ -3,6 +3,8 @@
 namespace Framework;
 
 use ReflectionMethod;
+use ReflectionClass;
+
 class Dispatcher
 {
     public function __construct(private Router $router)
@@ -20,10 +22,11 @@ class Dispatcher
         $action = $this->getMethodName($url_parameters);
         $controller = $this->getControllerName($url_parameters);
 
+        $controller_object = $this->getDependencies($controller);
 
-        $controller_object = new $controller;
         $arguments = $this->getActionArguments($controller, $action, $url_parameters);
         $controller_object->$action(...$arguments);
+
     }
 
     private function getActionArguments(string $controller, string $action, array $parameters): array
@@ -31,7 +34,7 @@ class Dispatcher
         $arguments = [];
         $method = new ReflectionMethod($controller, $action);
 
-        foreach($method->getParameters() as $parameter) {
+        foreach ($method->getParameters() as $parameter) {
             $name = $parameter->getName();
             $arguments[$name] = $parameters[$name];
         };
@@ -62,5 +65,30 @@ class Dispatcher
         $action = $parameters["action"];
         return str_replace("-", "", lcfirst(ucwords(strtolower($action), "-")));
 
+    }
+
+    private function getDependencies(string $class_name): object
+    {
+        $reflection = new ReflectionClass($class_name);
+
+        $reflectionConstructor = $reflection->getConstructor();
+
+        $reflectedDependencies = [];
+
+        if ($reflectionConstructor === null) {
+
+            return new $class_name;
+
+        }
+
+        foreach ($reflectionConstructor->getParameters() as $parameter) {
+
+            $type = (string) $parameter->getType();
+
+            $reflectedDependencies[] = $this->getDependencies($type);
+
+        }
+
+        return new $class_name(...$reflectedDependencies);
     }
 }
