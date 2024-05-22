@@ -3,11 +3,11 @@
 namespace Framework;
 
 use ReflectionMethod;
-use ReflectionClass;
 
 class Dispatcher
 {
-    public function __construct(private Router $router)
+    public function __construct(private Router $router,
+                                private Container $container)
     {
     }
 
@@ -22,7 +22,7 @@ class Dispatcher
         $action = $this->getMethodName($url_parameters);
         $controller = $this->getControllerName($url_parameters);
 
-        $controller_object = $this->getDependencies($controller);
+        $controller_object = $this->container->getDeps($controller);
 
         $arguments = $this->getActionArguments($controller, $action, $url_parameters);
         $controller_object->$action(...$arguments);
@@ -65,30 +65,5 @@ class Dispatcher
         $action = $parameters["action"];
         return str_replace("-", "", lcfirst(ucwords(strtolower($action), "-")));
 
-    }
-
-    private function getDependencies(string $class_name): object
-    {
-        $reflection = new ReflectionClass($class_name);
-
-        $reflectionConstructor = $reflection->getConstructor();
-
-        $reflectedDependencies = [];
-
-        if ($reflectionConstructor === null) {
-
-            return new $class_name;
-
-        }
-
-        foreach ($reflectionConstructor->getParameters() as $parameter) {
-
-            $type = (string) $parameter->getType();
-
-            $reflectedDependencies[] = $this->getDependencies($type);
-
-        }
-
-        return new $class_name(...$reflectedDependencies);
     }
 }
