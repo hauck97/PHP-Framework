@@ -2,7 +2,26 @@
 
 declare(strict_types=1);
 
+$show_errors = false;
+
+if ($show_errors) {
+
+    ini_set("display_errors", "on");
+
+} else {
+
+    ini_set("display_errors", "off");
+
+    require "./../views/500.php";
+
+}
+
 $path = parse_url("$_SERVER[REQUEST_URI]", PHP_URL_PATH);
+
+if ($path === false) {
+    throw new UnexpectedValueException("Malformed URL:
+                                       '{$_SERVER["REQUEST_URI"]}'");
+}
 
 spl_autoload_register(function (string $class_name) {
     require "./../" . str_replace("\\", "/" , $class_name) . ".php";
@@ -23,7 +42,7 @@ $container = new Framework\Container();
 
 $container->set(App\Database::class, function() {
 
-    return new App\Database("172.18.0.4", "product_db", "product_db_user", "150415");
+    return new App\Database("172.18.0.2", "product_db", "product_db_user", "150415");
 
 });
 
