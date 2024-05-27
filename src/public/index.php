@@ -19,6 +19,9 @@ $router->add("/{controller}/{action}");
 
 $container = new Framework\Container();
 
-$dispatcher = new \Framework\Dispatcher($router, $container);
+$database = new App\Database("172.18.0.4", "product_db", "product_db_user", "150415");
+$container->set(App\Database::class, $database);
+
+$dispatcher = new Framework\Dispatcher($router, $container);
 
 $dispatcher->handle($path);
