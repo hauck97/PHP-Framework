@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 use PDO;
 
@@ -11,7 +13,6 @@ class Database
                                 private string $password
     )
     {
-        echo "Created Database object";
     }
 
     public function getConnection(): PDO

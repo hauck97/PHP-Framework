@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $path = parse_url("$_SERVER[REQUEST_URI]", PHP_URL_PATH);
 
 spl_autoload_register(function (string $class_name) {
@@ -19,8 +21,11 @@ $router->add("/{controller}/{action}");
 
 $container = new Framework\Container();
 
-$database = new App\Database("172.18.0.4", "product_db", "product_db_user", "150415");
-$container->set(App\Database::class, $database);
+$container->set(App\Database::class, function() {
+
+    return new App\Database("172.18.0.4", "product_db", "product_db_user", "150415");
+
+});
 
 $dispatcher = new Framework\Dispatcher($router, $container);
 
