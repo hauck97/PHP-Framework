@@ -2,19 +2,34 @@
 
 declare(strict_types=1);
 
-$show_errors = false;
+set_error_handler(function(
+    int $errorNumber,
+    string $errorString,
+    string $errorFile,
+    int $errorLine
+): bool
+{
+   throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
+});
 
-if ($show_errors) {
+set_exception_handler(function(Throwable $exception) {
 
-    ini_set("display_errors", "on");
+    $show_errors = true;
 
-} else {
+    if ($show_errors) {
 
-    ini_set("display_errors", "off");
+        ini_set("display_errors", "on");
 
-    require "./../views/500.php";
+    } else {
 
-}
+        ini_set("display_errors", "off");
+
+        require "./../views/500.php";
+
+    }
+
+    throw $exception;
+});
 
 $path = parse_url("$_SERVER[REQUEST_URI]", PHP_URL_PATH);
 
