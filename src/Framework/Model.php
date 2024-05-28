@@ -12,13 +12,27 @@ abstract class Model
     public function __construct(private Database $database)
     {
     }
+
+    private function getTable(): string
+    {
+        if ($this->table !== null) {
+
+            return $this->table;
+
+        }
+
+        $qualifiedClassnameSplit = explode("\\", strtolower($this::class));
+
+        return array_pop($qualifiedClassnameSplit);
+    }
+
     public function findAll(): array
     {
 
         $pdo = $this->database->getConnection();
 
         $statement = "SELECT * 
-                      FROM {$this->table}";
+                      FROM {$this->getTable()}";
 
         $stmt = $pdo->query($statement);
 
@@ -31,7 +45,7 @@ abstract class Model
         $pdo = $this->database->getConnection();
 
         $statement =    "SELECT * 
-                         FROM {$this->table} 
+                         FROM {$this->getTable()} 
                          WHERE id = :id";
 
         $stmt = $pdo->prepare($statement);
