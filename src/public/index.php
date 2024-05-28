@@ -7,6 +7,9 @@ spl_autoload_register(function (string $class_name) {
     require "./../" . str_replace("\\", "/" , $class_name) . ".php";
 });
 
+$dotEnv = new Framework\Dotenv;
+$dotEnv->load("./../../.env");
+
 set_error_handler("Framework\ErrorHandler::handleError");
 
 set_exception_handler("Framework\ErrorHandler::handleException");
